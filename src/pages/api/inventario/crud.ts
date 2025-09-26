@@ -45,6 +45,9 @@ export async function editarInventario({
   data: any;
 }) {
   const table = tableName(tipo, sede);
+  // Forzar nombre en mayúsculas
+  if (data.nombre) data.nombre = String(data.nombre).toUpperCase();
+  if (data.codigo) data.codigo = String(data.codigo).toUpperCase();
   const { error } = await supabase.from(table).update(data).eq("id", id);
 
   console.log("Inventario editado:", data, " en la tabla:", table);
@@ -61,6 +64,8 @@ export async function actualizarInventario({
   data: any;
 }) {
   const table = tableName(tipo, sede);
+  // Forzar nombre en mayúsculas
+  if (data.nombre) data.nombre = String(data.nombre).toUpperCase();
   const itemExistente = await buscarItemPorCodigo({ tipo, sedeDestino: sede, codigo: data.codigo });
   if (!itemExistente) {
     throw new Error("El item con el código especificado no existe en la sede.");
@@ -69,7 +74,7 @@ export async function actualizarInventario({
   const cantidadActual = Number(itemExistente?.cantidad ?? 0);
   const nuevaCantidad = cantidadActual + Number(data?.cantidad ?? 0);
   const { error } = await supabase.from(table).update({ ...data, cantidad: nuevaCantidad }).eq("codigo", data?.codigo);
-  const detalle = "Compra de " + (data?.nombre ?? "N/A");
+  const detalle = "Compra de " + (data?.codigo ?? "N/A");
   await actualizarKardex({ data: { ...data, nuevaCantidad: nuevaCantidad }, detalle });
   console.log("Inventario actualizado:", { ...data, cantidad: nuevaCantidad }, " en la tabla:", table);
   if (error) throw new Error(error.message);
@@ -150,9 +155,14 @@ export async function agregarInventario({
   sede: Sede;
 }) {
   const tabla = tableName(tipo, sede);
+  // Forzar nombre en mayúsculas
+  if (data.nombre) data.nombre = String(data.nombre).toUpperCase();
+  if (data.codigo) data.codigo = String(data.codigo).toUpperCase();
+  if (data.categoria) data.categoria = String(data.categoria).toUpperCase();
+  if (data.unid_med) data.unid_med = String(data.unid_med).toUpperCase();
   const detalle =
     "Compra de " +
-    (data?.nombre ?? "N/A");
+    (data?.codigo ?? "N/A");
   const { error } = await supabase.from(tabla).insert(data);
   await agregarKardex({ data, detalle });
   console.log("Nuevo inventario agregado:", data, " en la tabla:", tabla);

@@ -1,0 +1,25 @@
+---
+import "../../styles/global.css";
+const { cc, presupuesto, onDelete, onEdit } = Astro.props;
+---
+
+<tr>
+  <td class="p-2 border-b">{cc}</td>
+  <td class="p-2 border-b text-right"
+    >{
+      Number(presupuesto).toLocaleString("es-PE", { minimumFractionDigits: 2 })
+    }</td
+  >
+  <td class="p-2 border-b text-center">
+    <button
+      class="text-blue-600 hover:underline mr-2"
+      type="button"
+      onClick={() => onEdit && onEdit(cc, presupuesto)}>Editar</button
+    >
+    <button
+      class="text-red-600 hover:underline"
+      type="button"
+      onClick={() => onDelete && onDelete(cc)}>Eliminar</button
+    >
+  </td>
+</tr>

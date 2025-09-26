@@ -1,0 +1,108 @@
+---
+import "../../styles/global.css";
+// import { supabase } from "../../lib/supabase/SupabaseClient";
+import { useState, useEffect } from "preact/hooks";
+import PresupuestoList from "./PresupuestoList.astro";
+
+let centrosCostos = [];
+let loading = true;
+let error = "";
+
+try {
+  const { data, error: err } = await supabase
+    .from("centro_costo")
+    .select("codigo, proyecto")
+    .order("codigo", { ascending: true });
+  if (err) throw err;
+  centrosCostos = data ?? [];
+  loading = false;
+} catch (e) {
+  error = "Error cargando centros de costo";
+  loading = false;
+}
+
+let mensaje = "";
+let selectedCC = "";
+let presupuesto = "";
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  mensaje = "";
+  if (!selectedCC || !presupuesto) {
+    mensaje = "Completa todos los campos.";
+    return;
+  }
+  try {
+    const res = await fetch("/api/proyectos/presupuesto", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cc: selectedCC, presupuesto: Number(presupuesto) })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      mensaje = data.error || "Error guardando presupuesto.";
+    } else {
+      mensaje = "¡Presupuesto asignado correctamente!";
+      presupuesto = "";
+      selectedCC = "";
+    }
+  } catch (err) {
+    mensaje = "Error de conexión con el servidor.";
+  }
+}
+---
+
+<div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow border">
+  {
+    loading ? (
+      <div class="text-gray-500">Cargando centros de costo...</div>
+    ) : error ? (
+      <div class="text-red-600">{error}</div>
+    ) : (
+      <form onSubmit={handleSubmit} class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Centro de Costo
+          </label>
+          <select
+            class="border rounded px-2 py-1 w-full"
+            value={selectedCC}
+            onInput={(e) => (selectedCC = e.target.value)}
+            required
+          >
+            <option value="">Selecciona un centro de costo</option>
+            {centrosCostos.map((cc) => (
+              <option value={cc.codigo}>
+                {cc.codigo} - {cc.proyecto}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Presupuesto (S/)
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            class="border rounded px-2 py-1 w-full"
+            value={presupuesto}
+            onInput={(e) => (presupuesto = e.target.value)}
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Guardar
+        </button>
+        {mensaje && (
+          <div class="mt-2 text-center text-green-600">{mensaje}</div>
+        )}
+      </form>
+    )
+  }
+</div>
+<PresupuestoList />
