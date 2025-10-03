@@ -7,9 +7,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (!cc || typeof presupuesto !== "number") {
       return new Response(JSON.stringify({ error: "Datos incompletos" }), { status: 400 });
     }
-    const { error } = await supabase
-      .from("presupuesto_cc")
-      .upsert({ cc, presupuesto }, { onConflict: ["cc"] });
+    const { data, error } = await supabase
+    .from("presupuesto_cc")
+    .update({ presupuesto })
+    .eq("cc", cc);
     if (error) {
       return new Response(JSON.stringify({ error: "Error guardando presupuesto" }), { status: 500 });
     }
@@ -18,3 +19,12 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(JSON.stringify({ error: "Error en el servidor" }), { status: 500 });
   }
 };
+
+export async function listCC(){
+  const { data, error } = await supabase
+    .from("centro_costo")
+    .select("*")
+    .order("codigo", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
