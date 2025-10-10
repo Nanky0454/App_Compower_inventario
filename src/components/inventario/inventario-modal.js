@@ -12,6 +12,7 @@ export function openTransferModal(row) {
   document.getElementById("transfer-cantidad").value = "";
   document.getElementById("transfer-sede-destino").value = "";
   modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 export async function submitTransferForm(e) {
@@ -174,11 +175,13 @@ export function openEditModal(row) {
   const modal = document.getElementById("edit-modal");
   fillEditForm(row);
   modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 export function openNewModal() {
   const modal = document.getElementById("new-modal");
   modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 export function openDeleteModal(row) {
@@ -187,16 +190,22 @@ export function openDeleteModal(row) {
   document.getElementById("delete-tipo").value = row.tipo;
   document.getElementById("delete-nombre").textContent = row.nombre;
   modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 export function openAddModal(row) {
   const modal = document.getElementById("add-modal");
   fillAddForm(row);
   modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 export function closeModal(id) {
-  document.getElementById(id).classList.add("hidden");
+  const m = document.getElementById(id);
+  if (m) {
+    m.classList.add("hidden");
+    m.classList.remove("flex");
+  }
 }
 
 function fillAddForm(row) {
@@ -375,10 +384,6 @@ export async function submitNewForm(e) {
 
   if (res.ok) {
     showModalSuccess("new-modal", "¡Agregado correctamente!");
-    setTimeout(
-      () => (window.location.href = `?tipo=${tipo}&sede=${sede}`),
-      5000
-    );
     setTimeout(
       () => (window.location.href = `?tipo=${tipo}&sede=${sede}`),
       5000

@@ -124,6 +124,15 @@ const currentSede = Astro.url.searchParams.get('sede') || 'surco';
                     <span>🔄</span> Traslados
                   </a>
                 </li>
+                <li>
+                  <a
+                    href="/transfer"
+                    class="hover:text-blue-300 flex items-center gap-2 justify-between"
+                  >
+                    <span class="flex items-center gap-2"><span>📤</span> Transferencias</span>
+                    <span class="text-sm bg-white text-blue-600 px-2 rounded-full">Nuevo</span>
+                  </a>
+                </li>
               </>
             )}
             {role === 'cashier' && (
@@ -192,6 +201,15 @@ const currentSede = Astro.url.searchParams.get('sede') || 'surco';
                         >Herramientas (Cusco)</a>
                     </li>
                   </ul>
+                </li>
+                <li>
+                  <a
+                    href="/transfer"
+                    class="hover:text-blue-300 flex items-center gap-2 justify-between"
+                  >
+                    <span class="flex items-center gap-2"><span>📤</span> Transferencias</span>
+                    <span class="text-sm bg-white text-blue-600 px-2 rounded-full">Nuevo</span>
+                  </a>
                 </li>
             )}
           </ul>

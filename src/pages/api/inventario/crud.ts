@@ -26,6 +26,25 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(e?.message || "Error en la operación", { status: 500 });
   }
 };
+export const GET: APIRoute = async ({ request }) => {
+  try {
+    const url = new URL(request.url);
+    const params = url.searchParams;
+    const action = params.get('action');
+    if (action === 'buscar') {
+      const tipo = params.get('tipo') as any;
+      const sede = params.get('sede') as any;
+      const codigo = params.get('codigo') || '';
+      if (!tipo || !sede || !codigo) return new Response(null, { status: 400 });
+      const item = await buscarItemPorCodigo({ tipo, sedeDestino: sede, codigo });
+      if (!item) return new Response(JSON.stringify(null), { status: 200 });
+      return new Response(JSON.stringify(item), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    return new Response('Acción no soportada', { status: 400 });
+  } catch (e: any) {
+    return new Response(e?.message || 'Error', { status: 500 });
+  }
+};
 import { supabase } from "../../../lib/supabase/SupabaseClient";
 import type { Tipo } from "./get";
 import type { Sede } from "./get";

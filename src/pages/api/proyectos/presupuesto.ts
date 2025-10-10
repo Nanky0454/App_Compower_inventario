@@ -3,28 +3,61 @@ import { supabase } from "../../../lib/supabase/SupabaseClient";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { cc, presupuesto } = await request.json();
-    if (!cc || typeof presupuesto !== "number") {
-      return new Response(JSON.stringify({ error: "Datos incompletos" }), { status: 400 });
+    const body = await request.json();
+    const { action, ...params } = body;
+    if (action === "editar") {
+      const { ...data } = params;
+      await editCC({ data });
+      return new Response("OK");
+    } else if (action === "eliminar") {
+      return new Response("No implementado", { status: 400 });
+    } else {
+      return new Response("Acción no soportada", { status: 400 });
     }
-    const { data, error } = await supabase
-    .from("presupuesto_cc")
-    .update({ presupuesto })
-    .eq("cc", cc);
-    if (error) {
-      return new Response(JSON.stringify({ error: "Error guardando presupuesto" }), { status: 500 });
-    }
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: "Error en el servidor" }), { status: 500 });
+  } catch (e: any) {
+    return new Response(e?.message || "Error en la operación", { status: 500 });
   }
 };
 
-export async function listCC(){
+export async function listCC() {
   const { data, error } = await supabase
     .from("centro_costo")
     .select("*")
     .order("codigo", { ascending: true });
   if (error) throw new Error(error.message);
   return data ?? [];
+}
+
+export async function editCC({ data }: { data: any }) {
+
+  if(data.codigo) data.codigo = data.codigo.toUpperCase();
+  if(data.cliente) data.cliente = data.cliente.toUpperCase();
+  if(data.coordinador) data.coordinador = data.coordinador.toUpperCase();
+  if(data.proyecto) data.proyecto = data.proyecto.toUpperCase();
+  if(data.presupuesto) data.presupuesto = Number(data.presupuesto);
+
+  console.log("Editando CC", data);
+  const { error } = await supabase
+    .from("centro_costo")
+    .update(data)
+    .eq("id", data.id);
+  if (error) throw new Error(error.message);
+  return true;
+}
+
+export async function deleteCC({ id }: { id: number | string }) {
+  const { error } = await supabase.from("centro_costo").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  return true;
+}
+
+export async function addCC({ data }: { data: any }) {
+  if(data.codigo) data.codigo = data.codigo.toUpperCase();
+  if(data.cliente) data.cliente = data.cliente.toUpperCase();
+  if(data.coordinador) data.coordinador = data.coordinador.toUpperCase();
+  if(data.proyecto) data.proyecto = data.proyecto.toUpperCase();
+  if(data.presupuesto) data.presupuesto = Number(data.presupuesto);
+  const { error } = await supabase.from("centro_costo").insert([data]);
+  if (error) throw new Error(error.message);
+  return true;
 }
