@@ -5,7 +5,6 @@ const role = Astro.cookies.get('sb-role')?.value ?? '';
 const username = Astro.cookies.get('sb-username')?.value ?? '';
 const currentSede = Astro.url.searchParams.get('sede') || 'surco';
 
-
 let email = Astro.cookies.get('sb-email')?.value ?? '';
 if (!email) {
   const accessToken = Astro.cookies.get('sb-access-token')?.value ?? '';

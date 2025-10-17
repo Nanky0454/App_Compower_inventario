@@ -1,7 +1,7 @@
 ---
 import '../../styles/global.css';
 
-const role = Astro.cookies.get('sb-role')?.value ?? '';
+const username = Astro.cookies.get('sb-username')?.value ?? '';
 ---
 
 <div class="overflow-x-auto rounded-lg border">
@@ -20,7 +20,7 @@ const role = Astro.cookies.get('sb-role')?.value ?? '';
     </thead>
 
     <tbody>
-      
+      {username}
     </tbody>
   </table>
 </div>
